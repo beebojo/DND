@@ -1,0 +1,74 @@
+import random
+import math
+from datetime import date
+
+today = date.today()
+dndlog = open("dndlog.txt", "a")
+dndlog.write("\nSession Date: " + today.strftime("%B %d, %Y") + "\n")
+
+stats = [strength := 18, dex := 12, con := 15, intel := 9, wis := 16, cha := 11]
+modifier = []
+
+for mod in stats:
+    mod = math.floor((mod - 10) / 2)
+    modifier.append(mod)
+
+
+# When calling function, must print(function()) or it wont be seen
+def dice(x, y):
+    return random.randint(x, y)
+
+def dice_adv(x, y):
+    return max([dice(x, y), dice(x, y)])
+
+
+
+def dice_dis(x, y):
+    return min([dice(x, y), dice(x, y)])
+
+
+def roll_initiative(x, y):
+    return dice(x, y) + modifier[1]
+
+
+def attack(x, y):
+    return dice(x, y) + modifier[0]
+
+
+
+def menu():
+    print("\n [1] Roll d20\n [2] Roll with Advantage\n [3] Roll with Disadvantage\n [4] Roll Initiative\n [5] Attack\n ["
+          "6] Attack with Advantage\n [7] Attack with Disadvantage\n [8] Damage\n")
+
+
+menu()
+option = int(input("Select Action: "))
+
+while option != 0:
+    if option == 1:
+       roll = (dice(1,20))
+       dndlog.write(str(roll) + "\n")
+       print(roll)
+    elif option == 2:
+        print(dice_adv(1,20))
+    elif option == 3:
+        print(dice_dis(1,20))
+    elif option == 4:
+        print(roll_initiative(1,20))
+    elif option == 5:
+        print(attack(1,20))
+    elif option == 6:
+        print(dice_adv(1,20) + modifier[0])
+    elif option == 7:
+        print(dice_dis(1,20) + modifier[0])
+    elif option == 8:
+        print(attack(1,8))
+
+    else:
+        print("Not a Valid Option\n")
+    menu()
+    option = int(input("Select Action: "))
+
+print("Thanks for Playing!")
+dndlog.write("--------------\n")
+dndlog.close()
