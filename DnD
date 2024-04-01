@@ -1,39 +1,45 @@
-import random
-import math
+import random, math
 from datetime import date
 
-today = date.today()
+# Constants
+dice_min = 1
+damage_6 = 6
+damage_8 = 8
+dice_max = 20
+
+stats = {"strength" : 18, "dex" : 12, "con" : 15, "intel" : 9, "wis" : 16, "cha" : 11}
+modifier = {stat: math.floor((value-10) / 2) for stat, value in stats.items()}
+
+# Write to file
 dndlog = open("dndlog.txt", "a")
+today = date.today()
 dndlog.write("\nSession Date: " + today.strftime("%B %d, %Y") + "\n")
 
-stats = [strength := 18, dex := 12, con := 15, intel := 9, wis := 16, cha := 11]
-modifier = []
-
-for mod in stats:
-    mod = math.floor((mod - 10) / 2)
-    modifier.append(mod)
-
-
+# Functions
 # When calling function, must print(function()) or it wont be seen
-def dice(x, y):
+def roll_dice(x, y):
     return random.randint(x, y)
 
-def dice_adv(x, y):
-    return max([dice(x, y), dice(x, y)])
+def roll_advantage(x, y):
+    return max([roll_dice(x, y), roll_dice(x, y)])
 
-
-
-def dice_dis(x, y):
-    return min([dice(x, y), dice(x, y)])
-
+def roll_disadvantage(x, y):
+    return min([roll_dice(x, y), roll_dice(x, y)])
 
 def roll_initiative(x, y):
-    return dice(x, y) + modifier[1]
+    return roll_dice(x, y) + modifier["dex"]
 
+def attack():
+    return roll_dice(dice_min, dice_max) + modifier["strength"]
 
-def attack(x, y):
-    return dice(x, y) + modifier[0]
+def attack_advantage():
+    return roll_advantage(dice_min, dice_max) + modifier["strength"]
 
+def attack_disadvantage():
+    return roll_disadvantage(dice_min, dice_max) + modifier["strength"]
+
+def deal_damage():
+    return roll_dice(dice_min, damage_8) + modifier["strength"]
 
 
 def menu():
@@ -41,34 +47,55 @@ def menu():
           "6] Attack with Advantage\n [7] Attack with Disadvantage\n [8] Damage\n")
 
 
-menu()
-option = int(input("Select Action: "))
-
-while option != 0:
-    if option == 1:
-       roll = (dice(1,20))
-       dndlog.write(str(roll) + "\n")
-       print(roll)
-    elif option == 2:
-        print(dice_adv(1,20))
-    elif option == 3:
-        print(dice_dis(1,20))
-    elif option == 4:
-        print(roll_initiative(1,20))
-    elif option == 5:
-        print(attack(1,20))
-    elif option == 6:
-        print(dice_adv(1,20) + modifier[0])
-    elif option == 7:
-        print(dice_dis(1,20) + modifier[0])
-    elif option == 8:
-        print(attack(1,8))
-
-    else:
-        print("Not a Valid Option\n")
+def main():
     menu()
     option = int(input("Select Action: "))
 
-print("Thanks for Playing!")
-dndlog.write("--------------\n")
-dndlog.close()
+    while option != 0:
+        try:
+            if option == 1:
+                roll = roll_dice(dice_min, dice_max)
+                print(f"You rolled a {roll}")
+                dndlog.write(f"You rolled a {roll}\n")
+            elif option == 2:
+                roll = roll_advantage(dice_min, dice_max)
+                print(roll, " With Advantage")
+                dndlog.write(f"{roll} With Advantage\n")
+            elif option == 3:
+                roll = roll_disadvantage(dice_min, dice_max)
+                print(roll, " With Disadvantage")
+                dndlog.write(f"{roll} With Disadvantage\n")
+            elif option == 4:
+                roll = roll_initiative(dice_min, dice_max)
+                print(roll, "Initiative")
+                dndlog.write(f"{roll} Initiative\n")
+            elif option == 5:
+                roll = attack()
+                print(roll, " to hit")
+                dndlog.write(f"{roll} to hit\n")
+            elif option == 6:
+                roll = attack_advantage()
+                print(roll, " to hit with advantage")
+                dndlog.write(f"{roll} to hit with advantage\n")
+            elif option == 7:
+                roll = attack_disadvantage()
+                print(roll, " to hit with disadvantage")
+                dndlog.write(f"{roll} to hit with disadvantage\n")
+            elif option == 8:
+                roll = deal_damage()
+                print(roll, " Damage")
+                dndlog.write(f"{roll} Damage\n")
+            else:
+                print("Not a Valid Option\n")
+        except ValueError:
+            print("Invalid input. Please enter a valid option.\n")
+    
+        menu()
+        option = int(input("Select Action: "))
+
+    print("Thanks for Playing!")
+    dndlog.write("----------------\n")
+
+main()
+
+dndlog.close
